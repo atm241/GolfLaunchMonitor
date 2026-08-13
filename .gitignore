@@ -1,0 +1,13 @@
+# XcodeGen-generated project (regenerate with `xcodegen generate`)
+*.xcodeproj/
+
+# Xcode
+xcuserdata/
+DerivedData/
+build/
+*.xcworkspace/xcuserdata/
+.build/
+*.xcresult
+
+# macOS
+.DS_Store
