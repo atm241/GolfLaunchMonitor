@@ -106,7 +106,11 @@ struct RecordView: View {
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
             Button("Try Again") {
-                state = .ready
+                if captureSession.isConfigured {
+                    state = .ready
+                } else {
+                    Task { await requestPermissionAndConfigure() }
+                }
             }
             .buttonStyle(.borderedProminent)
         }
@@ -126,6 +130,10 @@ struct RecordView: View {
         }
 
         captureSession.configure()
+        guard captureSession.isConfigured else {
+            state = .failure(captureSession.lastError?.localizedDescription ?? "Couldn't set up the camera.")
+            return
+        }
         captureSession.start()
         state = .ready
     }

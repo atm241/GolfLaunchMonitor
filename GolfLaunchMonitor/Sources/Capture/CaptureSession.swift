@@ -144,6 +144,14 @@ final class CaptureSession: NSObject, ObservableObject {
 
     func startRecording(completion: @escaping (Result<RecordingResult, Error>) -> Void) {
         guard !movieOutput.isRecording else { return }
+        // AVCaptureMovieFileOutput throws an uncaught Objective-C exception (not a Swift
+        // error) if asked to record with no active video connection — e.g. no camera was
+        // available at configure() time. Guard explicitly so that case surfaces as a normal
+        // error instead of crashing the app.
+        guard isConfigured, let connection = movieOutput.connection(with: .video), connection.isActive else {
+            completion(.failure(lastError ?? CaptureError.configurationFailed))
+            return
+        }
         let tempURL = FileManager.default.temporaryDirectory
             .appendingPathComponent(UUID().uuidString)
             .appendingPathExtension("mov")
